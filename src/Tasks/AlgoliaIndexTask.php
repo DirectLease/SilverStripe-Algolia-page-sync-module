@@ -15,13 +15,18 @@ use TractorCow\Fluent\State\FluentState;
 
 /**
  * Class AlgoliaIndexTask
+ *
+ * This task will connect with your algolia environment based on the provided configuration and sync Pages to algolia.
+ * The task create algolia objects containing data and provides also a solution to sync localised data.
+ * For more information about the task see the README.MD
+ *
  * @package AlgoliaSyncModuleDirectLease
  */
 class AlgoliaIndexTask extends BuildTask
 {
 
     protected $title = 'DirectLease AlgoliaIndexTask';
-    protected $description = "This task will synchronize all Pages with ShowSearch on true with algolia. To perform a full wipe/insert use param fullsync=1";
+    protected $description = "This task will synchronize all published Pages with the Page value ShowInSearch(see CMS->Page->Settings) on true to Algolia";
 
     protected $enabled = true;
     protected $fluent_enabled = false;
@@ -85,9 +90,9 @@ class AlgoliaIndexTask extends BuildTask
             $algoliaObject['objectID'] = $page->ID; //PageID used as ID
             $algoliaObject['ClassName'] = $page->ClassName;
             // add fieldvalue for key in config yml array in algolia.yml
-            $algoliaObject = $this->addFieldDataToObjectIfsetOnPage($page, Config::inst()->get('AlgoliaSyncFieldsNonlocalised'), $algoliaObject);
+            $algoliaObject = $this->addFieldDataToObjectIfsetOnPage($page, Config::inst()->get('AlgoliaSyncFieldsNonLocalised'), $algoliaObject);
             // add image Link if in config yml array in algolia.yml
-            $algoliaObject = $this->addImageLinkToObjectIfSetOnPage($page, Config::inst()->get('AlgoliaSyncImagesNonlocalised'), $algoliaObject);
+            $algoliaObject = $this->addImageLinkToObjectIfSetOnPage($page, Config::inst()->get('AlgoliaSyncImagesNonLocalised'), $algoliaObject);
            // If Fluent is installed add localised data
            if ($this->fluent_enabled) {
                 $algoliaObject = $this->addDataForEveryLocale($page, $algoliaObject);
@@ -128,9 +133,9 @@ class AlgoliaIndexTask extends BuildTask
                     $page = Versioned::get_by_stage('Page', 'Live')->byID($page->ID);
                     $algoliaObject['Locales'][$locale->Locale] = $this->addDefaultData($page, $algoliaObject);
                     // add fieldvalue for key in config yml array in algolia.yml
-                    $algoliaObject['Locales'][$locale->Locale] = $this->addFieldDataToObjectIfsetOnPage($page, Config::inst()->get('AlgoliaSyncFieldslocalised'), $algoliaObject['Locales'][$locale->Locale]);
+                    $algoliaObject['Locales'][$locale->Locale] = $this->addFieldDataToObjectIfsetOnPage($page, Config::inst()->get('AlgoliaSyncFieldsLocalised'), $algoliaObject['Locales'][$locale->Locale]);
                     // add image Link if in config yml array in algolia.yml
-                    $algoliaObject['Locales'][$locale->Locale] = $this->addImageLinkToObjectIfSetOnPage($page, Config::inst()->get('AlgoliaSyncImageslocalised'), $algoliaObject['Locales'][$locale->Locale]);
+                    $algoliaObject['Locales'][$locale->Locale] = $this->addImageLinkToObjectIfSetOnPage($page, Config::inst()->get('AlgoliaSyncImagesLocalised'), $algoliaObject['Locales'][$locale->Locale]);
                 
                     return $algoliaObject;
                 });
@@ -207,7 +212,8 @@ class AlgoliaIndexTask extends BuildTask
     /**
      * Create PageAlgoliaObjectIDHolder for every added page in Algolia
      *
-     * We technically could just use the PageID for setting
+     * For every Page create an holder object containing a reference to the AlgoliaObject
+     * Since we set the ID of the algolia Object equal to our Page ID we can use Page->ID as the reference
      *
      * @param $pages
      * @param $savedObjectsResponse
@@ -222,7 +228,12 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * SynChanges removes old pages, updates pages and adds new pages to Algolia.
+     * Sync only pages with changes since the last sync, removed pages and added pages
+     *
+     * When a sync has been done we have a reference point and now can sync only the changes
+     * Their have been holders created containing ID's of the pages that have been deleted, we can remove those from algolia
+     * Their is a last sync date and we can get the pages that have been changed since that day, update those in algolia
+     * All the pages not having a holder are not synced and those are the pages being added since the last sync, add those to algolia
      *
      * @param $index
      * @throws \SilverStripe\ORM\ValidationException
@@ -231,7 +242,7 @@ class AlgoliaIndexTask extends BuildTask
         try {
             // safety check
             if (AlgoliaSyncLog::get()->count() == 0) {
-                $this->logInfo("A normal sync has been requested but there is no sync history. So it is not possible to sync the changes only.");
+                $this->logInfo("A normal sync has been requested but there is no sync history. So it is not possible to sync the changes only. A fullSync will now run, in order to create a sync history.");
                 return $this->fullSync($index);
             }
             // remove all deleted pages
@@ -249,7 +260,12 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * All pages that have been removed will
+     * remove all AlgoliaObjects of wich the page have been removed or ShowInSearch in the CMS has been set to false
+     *
+     * Get all the holders containing ID's of pages that have been removed,
+     * Get all the Page->ID's that have been synced and ShowInSearch have been toggled to false
+     * and delete those objects in algolia.
+     * Cleanup al the holders not needed anymore
      *
      * @param $index
      * @return int deleted count
@@ -271,7 +287,7 @@ class AlgoliaIndexTask extends BuildTask
             foreach ($deletedPageAlgoliaObjectIDHolders as $holder) {
                 $holder->delete();
             }
-            // delete page with ShowInSearch set to false
+            // delete holder for page with ShowInSearch set to false
             foreach ($pagesWithShowInSearchSetToFalse as $page){
                 $holder = PageAlgoliaObjectIDHolder::get()->filter('AlgoliaObjectID',$page->ID)->first();
                 if($holder) {
