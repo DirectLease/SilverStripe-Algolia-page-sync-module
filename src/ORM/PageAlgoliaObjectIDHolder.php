@@ -7,7 +7,7 @@ namespace AlgoliaSyncModuleDirectLease;
 use SilverStripe\ORM\DataObject;
 
 /**
- * Class PageAlgoliaObjectIDHolder Used for knowing wich pages have been synced to Algolia
+ * Used for track which pages have been synced to Algolia.
  * @package AlgoliaSyncModuleDirectLease
  */
 class PageAlgoliaObjectIDHolder extends DataObject

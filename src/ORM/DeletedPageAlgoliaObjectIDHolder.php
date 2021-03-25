@@ -7,7 +7,7 @@ namespace AlgoliaSyncModuleDirectLease;
 use SilverStripe\ORM\DataObject;
 
 /**
- * Class DeletedPageAlgoliaObjectIDHolder Used for knowing wich pages have been deleted the PageAlgoliaExtension have to be added on the page onBeforeDelete hook
+ * Used to track which pages have been deleted. Used in the onBeforeDelete hook in the PageAlgoliaExtension.
  * @package AlgoliaSyncModuleDirectLease
  */
 class DeletedPageAlgoliaObjectIDHolder extends DataObject

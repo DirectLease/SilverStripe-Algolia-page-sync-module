@@ -14,7 +14,7 @@ use TractorCow\Fluent\State\FluentState;
 
 
 /**
- * Class AlgoliaIndexTask Read more https://directlease.atlassian.net/wiki/spaces/DZS/pages/1778253825/AlgoliaIndexTask
+ * Class AlgoliaIndexTask
  * @package AlgoliaSyncModuleDirectLease
  */
 class AlgoliaIndexTask extends BuildTask
@@ -48,31 +48,32 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * remove state here and remove all object in algolia index and add them again for a fresh state
+     * Remove state and remove all objects in Algolia index. Then add them again for a fresh state.
      *
      * @param $index algolia index
      */
     private function fullSync($index) {
         try {
-            $index->clearObjects(); // remove all excisting objects in algolia
+            $index->clearObjects(); // remove all existing objects in algolia
             $deletedCount = $this->deleteAllPageAlgoliaObjectIDHolder(); // remove all existing objects
             $this->deleteAllDeletedPageAlgoliaObjectIDHolder(); // remove all existing objects
             $pages = Versioned::get_by_stage('Page', 'Live')->filter('ShowInSearch', true);
             $syncCount = $this->syncPagesWithIndex($index, $pages);
             $this->createLogDataObject(true, $syncCount, 0, $deletedCount); // create a log object containing information about the sync
-            $this->logInfo("Succesfull did a full sync with page count:". $syncCount);
+            $this->logInfo("Successfully did a full sync with page count:". $syncCount);
         } catch (Exception $e) {
             $this->logError("Error during full Algolia SYNC with message: ".$e->getMessage());
         }
     }
 
     /**
-     * Add pages to the algolia index
+     * Add pages to the Algolia index
      *
-     * For every config variable in the yaml add the fields to the algolia object this either are datafields or url of imaages wich can be localised as well as nonlocalised values
+     * For every entry in the AlgoliaSyncFields & AlgoliaSyncImages (for both the Localised and NonLocalised varieties) in the yml, add the data to the Algolia object.
+     * These are either datafields or url's of images, and can be localised as well as non-localised values.
      *
      * @param $index algolia index
-     * @param $pages pages that needs to be added to the index
+     * @param $pages pages that need to be added to the index
      * @param $update boolean If the sync is an update, if false it creates a PageAlgoliaObjectIDHolder
      * @return int the count of pages being synced
      * @throws \SilverStripe\ORM\ValidationException
@@ -107,11 +108,11 @@ class AlgoliaIndexTask extends BuildTask
     }
     
     /**
-     * Add localised data for every locale to the algolia object 
+     * Add localised data for every locale to the Algolia object
      * 
-     * If Fluent is enabled a page might have DB/Images values that are different in every locale.
-     * If these variabeles are set in AlgoliaSyncFieldslocalised or AlgoliaSyncImageslocalised they will be added to the algoliaOjbect
-     * $algoliaObject->Locales->Locale->Key => value 
+     * If Fluent is enabled, a page might have DB/Images values that are different in every locale (localised).
+     * If these variables are set in AlgoliaSyncFieldslocalised or AlgoliaSyncImageslocalised, they will be added to the algoliaObject by this method.
+     * This will result in: $algoliaObject->Locales->Locale->Key => value
      * 
      * @param $page
      * @param $algoliaObject
@@ -138,9 +139,9 @@ class AlgoliaIndexTask extends BuildTask
     }
     
     /**
-     * Add default data to the algoliaobject
+     * Add default data to the algoliaObject
      *
-     * adds title, url and menutitle
+     * Adds title, url and menutitle to the algoliaObject
      *
      * @param $page
      * @param $algoliaObject
@@ -148,7 +149,7 @@ class AlgoliaIndexTask extends BuildTask
      */
     private function addDefaultData($page, $algoliaObject) {
         $algoliaObject['Title'] = $page->Title;
-        // in current context we get the stage url we do not wan't to fill in algolia
+        // in current context we get the stage url. we do not want to use this in algolia
         if ($page->ClassName == RedirectorPage::class) {
             $link = $page->Link();
             $link = str_replace("/?stage=Stage", "", $link);
@@ -162,11 +163,11 @@ class AlgoliaIndexTask extends BuildTask
     }
     
     /**
-     * For every field in the config check if the page has that field and if it contains data add it to the object
+     * For every field defined in the config yml, check if the page has that field. If it contains data, add it to the object.
      *
      * @param $page
-     * @param $config yaml fieldNames if they exist on the page they will be added to the object that wel be synced to algolia
-     * @param $object object of wich the data needs to be added tho
+     * @param $config yaml fieldNames: if they exist on the page, they will be added to the object that will be synced to Algolia
+     * @param $object object object to which the data needs to be added
      * @return mixed
      */
     private function addFieldDataToObjectIfsetOnPage($page, $config, $object) {
@@ -182,11 +183,11 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * For every Field in the config check if the page has that Image and if it is set add the Link() to the object
+     * For every image in the config yml, check if the page has that Image. If it is set, add the Link() to the object.
      *
      * @param $page
-     * @param $config yaml has_one image object relation names if they exist on the page the Link() will be added to the object that wel be synced to algolia
-     * @param $object object of wich the data needs to be added tho
+     * @param $config yaml has_one image object relation names: if they exist on the page, the Link() will be added to the object that will be synced to Algolia
+     * @param $object object object to which the data needs to be added
      * @return mixed
      */
     private function addImageLinkToObjectIfSetOnPage($page, $config, $object) {
@@ -204,9 +205,9 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * Create PageAlgoliaObjectIDHolder for every added page in algolia
+     * Create PageAlgoliaObjectIDHolder for every added page in Algolia
      *
-     * we technical could just use the PageID for setting
+     * We technically could just use the PageID for setting
      *
      * @param $pages
      * @param $savedObjectsResponse
@@ -221,7 +222,7 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * synChanages remove old pages, update pages and add new pages to algolia
+     * SynChanges removes old pages, updates pages and adds new pages to Algolia.
      *
      * @param $index
      * @throws \SilverStripe\ORM\ValidationException
@@ -230,12 +231,12 @@ class AlgoliaIndexTask extends BuildTask
         try {
             // safety check
             if (AlgoliaSyncLog::get()->count() == 0) {
-                $this->logInfo("a normal sync has been requested but their is no sync history so it is not possible to sync the changes only");
+                $this->logInfo("A normal sync has been requested but there is no sync history. So it is not possible to sync the changes only.");
                 return $this->fullSync($index);
             }
             // remove all deleted pages
             $deletedCount = $this->deleteAlgoliaObjectsForIDs($index);
-            // update pages with changed these last 24 hours
+            // update pages that changed in the last 24 hours
             $updatedCount = $this->getChangedPagesAndUpdateAlgolia($index);
             // add new pages
             $addedCount = $this->addNewCreatedPagesToAlgolia($index);
@@ -280,14 +281,14 @@ class AlgoliaIndexTask extends BuildTask
         }
 
 
-        $this->logInfo("Succesfully removed pages from algolia amount of deleted page objects: ".$deletedCount);
+        $this->logInfo("Successfully removed pages from Algolia. Number of deleted page objects: ".$deletedCount);
         return $deletedCount;
     }
 
     /**
      * Add newly created Pages to Algolia
      * 
-     * Compare the PageAlgoliaObjectIDHolder ID's against the PageID's to find pages that have not been synced yet and sync those to algolia
+     * Compare the PageAlgoliaObjectIDHolderIDs against the PageIDs to find pages that have not been synced yet. Sync those pages to Algolia.
      * 
      * @param $index algolia index
      * @return int count of added Pages
@@ -297,13 +298,13 @@ class AlgoliaIndexTask extends BuildTask
         $syncedPages = PageAlgoliaObjectIDHolder::get()->map("ID", 'AlgoliaObjectID')->values();
         $pages = Versioned::get_by_stage('Page', 'Live')->filter(['ShowInSearch' => true, 'ID:not' => $syncedPages]);
         $syncCount = $this->syncPagesWithIndex($index, $pages);
-        $this->logInfo('Succesfully synced new created pages: '. $syncCount);
+        $this->logInfo('Successfully synced new created pages. Number of new pages synced: '. $syncCount);
         return $pages->count();
     }
 
 
     /**
-     * All the pages that have been synced to algolia with changed the past 24hours will be updated
+     * All the pages that have been synced to Algolia and which have changed in the past 24 hours will be updated.
      *
      * @param $index
      * @param int updated page count
@@ -317,10 +318,10 @@ class AlgoliaIndexTask extends BuildTask
             if($count = $pages->count() > 0) {
                 $this->syncPagesWithIndex($index, $pages, true);
             }
-            $this->logInfo('Succesfully Updated pages:'. $count);
+            $this->logInfo('Successfully updated pages. Number of pages updated: '. $count);
             return $count;
         }
-        $this->logInfo('Succesfully Updated pages: 0, this is because there have not been pages synced and their is something going wrong');
+        $this->logInfo('Successfully updated pages: 0. This is because there were no pages synced so something is going wrong.');
         return 0;
 
     }
@@ -333,7 +334,7 @@ class AlgoliaIndexTask extends BuildTask
     private function deleteAllPageAlgoliaObjectIDHolder(){
         $deleteCount = PageAlgoliaObjectIDHolder::get()->count();
         DB::query("DELETE FROM PageAlgoliaObjectIDHolder");
-        $this->logInfo('Succesfully deleted all PageAlgoliaObjectIDHolder: '.$deleteCount);
+        $this->logInfo('Successfully deleted all PageAlgoliaObjectIDHolder. Number of PageAlgoliaObjectIDHolder deleted: '.$deleteCount);
         return $deleteCount;
     }
 
@@ -342,11 +343,11 @@ class AlgoliaIndexTask extends BuildTask
      */
     private function deleteAllDeletedPageAlgoliaObjectIDHolder(){
         DB::query("DELETE FROM DeletedAlgoliaObjectIDHolder");
-        $this->logInfo('Succesfully deleted all DeletedPageAlgoliaObjectIDHolder');
+        $this->logInfo('Successfully deleted all DeletedPageAlgoliaObjectIDHolders.');
     }
 
     /**
-     * create a log object containing information about the task
+     * Create a log object containing information about the task
      *
      * @param $fullSync boolean if it is a fullsync or a normal sync
      * @param $addedCount int
@@ -365,7 +366,7 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * append silverstripe.log with error log message
+     * Append error log message to silverstripe.log
      *
      * @param $message string
      */
@@ -374,7 +375,7 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * append silverstripe.log with info log message
+     * Append info log message to silverstripe.log
      *
      * @param $message string
      */

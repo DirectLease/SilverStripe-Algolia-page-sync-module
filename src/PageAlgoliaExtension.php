@@ -6,8 +6,8 @@ use SilverStripe\ORM\DataExtension;
 class PageAlgoliaExtension extends DataExtension
 {
     /**
-     * To keep track of the state of our SiteTree we need to track the deleted pages so we can remove those from Algolia.
-     * Before a pages gets deleted create an object holding the ID.
+     * To keep track of the state of our SiteTree, we need to track the deleted pages so we can remove those from Algolia.
+     * Before a page gets deleted, create an object holding the ID.
      */
     public function onBeforeDelete()
     {
