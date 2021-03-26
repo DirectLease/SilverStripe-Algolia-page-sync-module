@@ -17,7 +17,7 @@ use TractorCow\Fluent\State\FluentState;
  * Class AlgoliaIndexTask
  *
  * This task will connect with your algolia environment based on the provided configuration and sync Pages to algolia.
- * The task create algolia objects containing data and provides also a solution to sync localised data.
+ * The task creates algolia objects containing data and also provides a solution to sync localised data.
  * For more information about the task see the README.MD
  *
  * @package AlgoliaSyncModuleDirectLease
@@ -230,10 +230,10 @@ class AlgoliaIndexTask extends BuildTask
     /**
      * Sync only pages with changes since the last sync, removed pages and added pages
      *
-     * When a sync has been done we have a reference point and now can sync only the changes
-     * Their have been holders created containing ID's of the pages that have been deleted, we can remove those from algolia
-     * Their is a last sync date and we can get the pages that have been changed since that day, update those in algolia
-     * All the pages not having a holder are not synced and those are the pages being added since the last sync, add those to algolia
+     * When a full sync has been done, we have a reference point and from their we can sync onl the changes.
+     * Holders were created, containing ID's of the pages that have been deleted. We can remove those from algolia.
+     * There is now a last sync date. We can get the pages that have been changed since that day and update those in Algolia.
+     * All the pages that do not have a holder are not synced. Those are the pages being added since the last sync. Add those to Algolia.
      *
      * @param $index
      * @throws \SilverStripe\ORM\ValidationException
@@ -260,12 +260,12 @@ class AlgoliaIndexTask extends BuildTask
     }
 
     /**
-     * remove all AlgoliaObjects of wich the page have been removed or ShowInSearch in the CMS has been set to false
+     * remove all AlgoliaObjects of which the page has been removed, or ShowInSearch in the CMS has been set to false
      *
-     * Get all the holders containing ID's of pages that have been removed,
-     * Get all the Page->ID's that have been synced and ShowInSearch have been toggled to false
+     * Get all the holders containing ID's of pages that have been removed.
+     * Get all the Page->ID's that have been synced and where ShowInSearch has been changed to false.
      * and delete those objects in algolia.
-     * Cleanup al the holders not needed anymore
+     * Clean up all the holders not needed anymore.
      *
      * @param $index
      * @return int deleted count

@@ -1,7 +1,7 @@
 # SilverStripe DirectLease Algolia page sync module
 
 This module packs a solution to sync Pages to Algolia via SilverStripe's BuildTask.
-It keeps track of the SiteTree to sync only the changes.
+It keeps track of the SiteTree to sync only the changes. It uses the build in SilverStripe "ShowInSearch" to determine if a Page needs to be synced. 
 
 ## How it works
 Via a Task and some ORM Objects the state of the SiteTree and Algolia can be managed.
