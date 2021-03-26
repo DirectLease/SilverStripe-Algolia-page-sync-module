@@ -1,7 +1,7 @@
 # SilverStripe DirectLease Algolia page sync module
 
 This module packs a solution to sync Pages to Algolia via SilverStripe's BuildTask.
-It keeps track of the SiteTree to sync only the changes.
+It keeps track of the SiteTree to sync only the changes. It uses the build in SilverStripe "ShowInSearch" to determine if a Page needs to be synced. 
 
 ## How it works
 Via a Task and some ORM Objects the state of the SiteTree and Algolia can be managed.
@@ -30,13 +30,13 @@ Fluent support
 
 
 ## Installation
-
+Not available yet on packagist 
 ```
-composer require silverstripe-module/skeleton 4.x-dev
+composer require directlease/silverstripe-algolia-page-sync-module
 ```
 
 ## License
-See [License](license)
+See [License](LICENSE)
 
 ## How to run
 If a sync hasn't been run yet, a full sync will happen. You can schedule this task for any given time period to keep your algolia data up to date.
@@ -70,22 +70,19 @@ The default values that will be added are:
 * PageClass
 * URL
 
-It is possible to add your own DBFields/functions for localised or non localised fields. It is also possible to add localised or non-localised Images if a DataObject has a $has_one relaion to that image. If you want to return your own data via a method, it is also possible to add this to the fields config (for example: via a method called getMyAwesomeCustomLogic).
+It is possible to add your own DBFields/functions for localised or non localised fields. It is also possible to add localised or non-localised Images if a DataObject has a $has_one relation to that image. If you want to return your own data via a method, it is also possible to add this to the fields config (for example: via a method called getMyAwesomeCustomLogic).
 
 ##### AlgoliaSyncFieldsLocalised & AlgoliaSyncFieldsNonLocalised
 An array containing the fields whose values are being synced to Algolia. The difference between the localised and non-localised keys is: if Fluent is installed, it will put the data in a localised object. The localised object in Algolia will be Locales->Locale->Key = Value, and the non-localised will result in Key = Value.
 
-It is also possible to add your own custom logic functions via getCustomLogic() on the Page class. Since the ORM will forward this function to CustomLogic it is possible to add this to the config.
-- "CustomLogic" 
+It is also possible to provide your own data. If you create your own function returning data you need to use the "get" prefix. For example a function called getMyCustomData() can be accessed if you add to the config:
+- "MyCustomData" 
 
-This will result in the Algolia object containing this as CustomLogic = Value (or Locales->Locale->CustomLogic = Value if localised) if the given page has this method and a value for it.
+The return value of function "getMyCustomData()" if available/not null will be added to the algolia object. In case of a localised object Locales->Locale->MyCustomData = Value, and the non-localised will result in MyCustomData = Value. 
 
 ##### AlgoliaSyncImagesLocalised & AlgoliaSyncImagesNonLocalised
 An array containing the names of $has_one image relations to be synced to Algolia. If the page has an Image relation, and the image is published, the Link() return will be saved in Algolia. The difference between the localised and non-localised keys is: if Fluent is installed, it will put the data in a localised object. The localised object in Algolia will be Locales->Locale->MyImage = URL, and the non-localised will result in MyImage = URL.
 - 'MyImage'
-
-
-
 
 ## Example configurations
 
