@@ -50,6 +50,7 @@ class AlgoliaIndexTask extends BuildTask
         else {
             $this->syncChanges($index);
         }
+        echo "The tasks use silverstripe default logging(most likely silverstripe.log). If the task succeeded their is also a DBObject 'AlgoliaSyncLog' containing information about the log. If the task runs from cli it most likely to output the logs.";
     }
 
     /**
@@ -87,8 +88,6 @@ class AlgoliaIndexTask extends BuildTask
         $dataForAlgolia = [];
         foreach ($pages as $page) {
             $algoliaObject = [];
-            $algoliaObject['objectID'] = $page->ID; //PageID used as ID
-            $algoliaObject['ClassName'] = $page->ClassName;
             // add fieldvalue for key in config yml array in algolia.yml
             $algoliaObject = $this->addFieldDataToObjectIfsetOnPage($page, Config::inst()->get('AlgoliaSyncFieldsNonLocalised'), $algoliaObject);
             // add image Link if in config yml array in algolia.yml
@@ -101,6 +100,9 @@ class AlgoliaIndexTask extends BuildTask
            else {
                $algoliaObject = $this->addDefaultData($page, $algoliaObject);
            }
+           // Add ClassName ObjectID always in root of object
+            $algoliaObject['objectID'] = $page->ID; //PageID used as ID
+            $algoliaObject['ClassName'] = $page->ClassName;
            $dataForAlgolia[] = $algoliaObject;
     
         }
