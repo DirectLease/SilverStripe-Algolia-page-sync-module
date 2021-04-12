@@ -20,7 +20,7 @@ Via Config it is possible to add fields/images urls that will be synced to an Al
 
 It is possible to add localised data if you use Fluent. Via config it is possible to add fields/image urls that will be added in the Algolia object in a local object. This makes it possible to use the Algolia search with search-attributes. For example, you can add as search attributes: Locales.nl_NL and this object will contain the data. Algolia is smart enough to include all the variables in this object.
 
-It will log to SilverStripe.log and a a record will be created after the task has run succesfully in the database.
+It will log to SilverStripe.log(based on config) and a a record will be created after the task has run succesfully in the database. Read more about silverstripe logging: https://docs.silverstripe.org/en/4/developer_guides/debugging/error_handling/
 
 ## Requirements
 
