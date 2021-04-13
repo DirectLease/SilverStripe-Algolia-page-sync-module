@@ -30,7 +30,6 @@ Fluent support
 
 
 ## Installation
-Not available yet on packagist 
 ```
 composer require directlease/silverstripe-algolia-page-sync-module
 ```
