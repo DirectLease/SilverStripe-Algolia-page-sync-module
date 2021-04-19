@@ -127,19 +127,20 @@ class AlgoliaIndexTask extends BuildTask
      */
     private function addDataForEveryLocale($page, $algoliaObject) {
         $locales = $page->getLocaleInstances();
+        $algoliaObject['Locales'] = [];
         foreach ($locales as $locale) {
-            $algoliaObject = FluentState::singleton()
-                ->withState(function (FluentState $state) use ($locale, $page, $algoliaObject) {
+            $algoliaObject['Locales'][$locale->Locale] = [];
+            $algoliaObject['Locales'][$locale->Locale] = FluentState::singleton()
+                ->withState(function (FluentState $state) use ($locale, $page) {
                     $state->setLocale($locale->Locale);
+                    $objectForLocalisedData = [];
                     // we need to get the page again since our fluent context is changed and we want to get the localised data
                     $page = Versioned::get_by_stage('Page', 'Live')->byID($page->ID);
-                    $algoliaObject['Locales'][$locale->Locale] = $this->addDefaultData($page, $algoliaObject);
+                    $objectForLocalisedData = $this->addDefaultData($page, $objectForLocalisedData);
                     // add fieldvalue for key in config yml array in algolia.yml
-                    $algoliaObject['Locales'][$locale->Locale] = $this->addFieldDataToObjectIfsetOnPage($page, Config::inst()->get('AlgoliaSyncFieldsLocalised'), $algoliaObject['Locales'][$locale->Locale]);
+                    $objectForLocalisedData = $this->addFieldDataToObjectIfsetOnPage($page, Config::inst()->get('AlgoliaSyncFieldsLocalised'), $objectForLocalisedData);
                     // add image Link if in config yml array in algolia.yml
-                    $algoliaObject['Locales'][$locale->Locale] = $this->addImageLinkToObjectIfSetOnPage($page, Config::inst()->get('AlgoliaSyncImagesLocalised'), $algoliaObject['Locales'][$locale->Locale]);
-                
-                    return $algoliaObject;
+                    return $this->addImageLinkToObjectIfSetOnPage($page, Config::inst()->get('AlgoliaSyncImagesLocalised'), $objectForLocalisedData);
                 });
         }
         return $algoliaObject;
