@@ -5,9 +5,6 @@ AlgoliaKeys:
   adminApiKey: '' # Algolia Admin API KEY
   applicationId: '' # Algolia App ID
   indexName: 'sitecontent' # default name of the index the pages will be synced in
-Page:
-  Extensions:
-    - AlgoliaSyncModuleDirectLease\PageAlgoliaExtension
 AlgoliaSyncFieldslocalised:
 AlgoliaSyncFieldsNonlocalised:
 AlgoliaSyncImageslocalised:
