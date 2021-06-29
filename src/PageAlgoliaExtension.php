@@ -24,8 +24,8 @@ class PageAlgoliaExtension extends DataExtension
      */
     public function onBeforeWrite()
     {
-        if ($this->isInDb()) {
-            if(!$this->isPublished()) {
+        if ($this->owner->isInDb()) {
+            if(!$this->owner->isPublished()) {
                 if (DeletedPageAlgoliaObjectIDHolder::get()->filter('AlgoliaObjectID', $this->owner->ID)->count() == 0) {
                     $holder = DeletedPageAlgoliaObjectIDHolder::create();
                     $holder->AlgoliaObjectID = $this->owner->ID;
