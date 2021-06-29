@@ -60,7 +60,7 @@ php vendor/silverstripe/framework/cli-script.php /dev/tasks/AlgoliaSyncModuleDir
 ```
 
 ## Configuration
-Via config an extension will be set on the Page Class. This will add an onBeforeDelete action to keep track of the deleted pages.
+Via config an extension will be set on the Page Class. This will add an onBeforeDelete action to keep track of the deleted/unpublished pages.
 Via config it is possible to add fields that will be synced to Algolia. If the field or image exists on the page, it will be added no matter the page type.
 
 The default values that will be added are:
