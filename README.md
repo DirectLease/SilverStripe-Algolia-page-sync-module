@@ -113,7 +113,7 @@ After:
   - '#algoliapagesyncmoduleconfig'
 ---
 Page:
- Extensions:
+ extensions:
   - AlgoliaSyncModuleDirectLease\PageAlgoliaExtension
 AlgoliaKeys:
   adminApiKey: '' # Algolia Admin API KEY
@@ -138,7 +138,7 @@ After:
   - '#algoliapagesyncmoduleconfig'
 ---
 Page:
- Extensions:
+ extensions:
   - AlgoliaSyncModuleDirectLease\PageAlgoliaExtension
 AlgoliaKeys:
   adminApiKey: '' # Algolia Admin API KEY
