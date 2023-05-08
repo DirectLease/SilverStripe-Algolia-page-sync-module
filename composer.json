@@ -9,8 +9,6 @@
     ],
     "license": "MIT",
     "require": {
-        "silverstripe/cms": "^4",
-        "silverstripe/framework": "^4",
         "algolia/algoliasearch-client-php": "^3"
 
     },
