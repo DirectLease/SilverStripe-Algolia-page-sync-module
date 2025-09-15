@@ -1,9 +1,9 @@
 <?php
 namespace AlgoliaSyncModuleDirectLease;
 
-use SilverStripe\ORM\DataExtension;
+use SilverStripe\Core\Extension;
 
-class PageAlgoliaExtension extends DataExtension
+class PageAlgoliaExtension extends Extension
 {
     /**
      * To keep track of the state of our SiteTree, we need to track the deleted pages so we can remove those from Algolia.
