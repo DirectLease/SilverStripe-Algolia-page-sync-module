@@ -11,7 +11,7 @@ class PageAlgoliaExtension extends Extension
      */
     public function onBeforeDelete()
     {
-        parent::onBeforeDelete();
+       // parent::onBeforeDelete();
         if(DeletedPageAlgoliaObjectIDHolder::get()->filter('AlgoliaObjectID', $this->owner->ID)->count() == 0) {
             $holder = DeletedPageAlgoliaObjectIDHolder::create();
             $holder->AlgoliaObjectID = $this->owner->ID;
@@ -25,7 +25,7 @@ class PageAlgoliaExtension extends Extension
      */
     public function onAfterWrite()
     {
-        parent::onAfterWrite();
+       // parent::onAfterWrite();
         if($this->owner->isArchived()) {
                 if (DeletedPageAlgoliaObjectIDHolder::get()->filter('AlgoliaObjectID', $this->owner->ID)->count() == 0) {
                     $holder = DeletedPageAlgoliaObjectIDHolder::create();
