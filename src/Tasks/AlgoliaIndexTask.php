@@ -35,7 +35,7 @@ use App\Models\PageAlgoliaObjectIDHolder;
  */
 class AlgoliaIndexTask extends BuildTask
 {
-    protected static string $commandName = 'app:algolia-index';
+    protected static string $commandName = 'algolia-index';
     protected string $title = 'DirectLease AlgoliaIndexTask';
     protected static string $description = "Synchronizes all published Pages to Algolia where ShowInSearch is enabled.";
 
