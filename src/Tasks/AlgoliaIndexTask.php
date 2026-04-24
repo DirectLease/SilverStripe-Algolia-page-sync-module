@@ -20,9 +20,9 @@ use TractorCow\Fluent\State\FluentState;
 
 // Assuming these DataObjects exist in your project.
 // You might need to adjust the namespace.
-use App\Models\AlgoliaSyncLog;
-use App\Models\DeletedPageAlgoliaObjectIDHolder;
-use App\Models\PageAlgoliaObjectIDHolder;
+use AlgoliaSyncModuleDirectLease\AlgoliaSyncLog;
+//use App\Models\DeletedPageAlgoliaObjectIDHolder;
+//use App\Models\PageAlgoliaObjectIDHolder;
 
 /**
  * Class AlgoliaIndexTask
@@ -57,8 +57,6 @@ class AlgoliaIndexTask extends BuildTask
      */
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
-        $this->logger = $output->getLogger();
-
         try {
             $client = SearchClient::create(
                 Config::inst()->get('AlgoliaKeys', 'applicationId'),
@@ -73,7 +71,7 @@ class AlgoliaIndexTask extends BuildTask
             if ($input->getOption('fullsync')) {
                 $this->fullSync($index);
             } else {
-                $this->syncChanges($index);
+                $this->syncChanges($index,$output);
             }
 
             $output->writeln("✅ Task finished. Check the logs and the 'AlgoliaSyncLog' database table for details.");
@@ -107,7 +105,7 @@ class AlgoliaIndexTask extends BuildTask
     /**
      * Sync only pages with changes since the last sync, removed pages and added pages
      */
-    private function syncChanges($index): void
+    private function syncChanges($index, PolyOutput $output): void
     {
         try {
             if (AlgoliaSyncLog::get()->count() === 0) {
@@ -116,14 +114,14 @@ class AlgoliaIndexTask extends BuildTask
                 return;
             }
 
-            $this->logInfo("Starting incremental sync...");
+            $output->writeln("Starting incremental sync...");
             $deletedCount = $this->deleteAlgoliaObjectsForIDs($index);
             $updatedCount = $this->getChangedPagesAndUpdateAlgolia($index);
             $addedCount = $this->addNewCreatedPagesToAlgolia($index);
             $this->createLogDataObject(false, $addedCount, $updatedCount, $deletedCount);
-            $this->logInfo("Incremental sync finished. Added: $addedCount, Updated: $updatedCount, Deleted: $deletedCount");
+            $output->writeln("Incremental sync finished. Added: $addedCount, Updated: $updatedCount, Deleted: $deletedCount");
         } catch (Exception $e) {
-            $this->logError("Error during Algolia SYNC with message: " . $e->getMessage());
+            $output->writeln("Error during Algolia SYNC with message: " . $e->getMessage());
         }
     }
 
