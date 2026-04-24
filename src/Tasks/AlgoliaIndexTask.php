@@ -218,7 +218,7 @@ class AlgoliaIndexTask extends BuildTask
     /**
      * For every image in the config yml, check if the page has that Image.
      */
-    private function addImageLinkToObjectIfSetOnPage($page, ?array $config, array $object): array
+    private function addImageLinkToObjectIfSetOnPage($page,  $config, array $object): array
     {
         if ($config) {
             foreach ($config as $value) {
